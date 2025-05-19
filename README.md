@@ -10,4 +10,4 @@ Um programa em Java integrado com HTML apenas com bibliotecas nativas que consom
 javac Main.java
 java Main 
 ```
-Acesse: [localhost:80/]() para visualizar o programa em execução.
+Acesse o [localhost:80/](http://localhost:80/) para visualizar o programa em execução.

@@ -11,3 +11,10 @@ javac Main.java
 java Main 
 ```
 Acesse o [localhost:80/](http://localhost:80/) para visualizar o programa em execução.
+
+## Compilando e Rodando o Javadoc
+
+```bash
+javadoc -d docs -private BuscaFilmes.java
+xdg-open docs/index.html
+```

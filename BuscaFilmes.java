@@ -1,11 +1,45 @@
 import java.io.*;
 import java.net.*;
 
+/**
+ * A classe {@code BuscaFilmes} implementa um servidor HTTP simples que escuta
+ * requisições da porta 80. O servidor disponibiliza uma interface web para
+ * busca
+ * de informações de filmes utilizando a API pública da OMDb (Open Movie
+ * Database).
+ *
+ * O servidor interpreta reqquisições GET para a raiz ("/") exibindo um
+ * formulário de busca,
+ * e para o caminho "buscar?t=Titulo", retorna informações detalhadas sobre o
+ * filme.
+ * Podendo ainda escolher se vai usar o caminho com plot completo
+ * ou simplificado.
+ * Endpoint de busca:
+ * /buscar?t=Titulo&plot=full
+ *
+ * Requests e Response são manipulados manualmente utilizando sockets.
+ * A resposta é construída em HTML, e o JSON é tratado como texto.
+ * 
+ * @author Emanuel Rawã Gurgel de Araújo Freitas
+ * @author José Ivo Schwade Araújo
+ * @version 1.0
+ */
 public class BuscaFilmes {
-
+  /**
+   * Porta onde o servidor irá executar as conexões.
+   */
   private static final int PORT = 80;
+  /**
+   * Chave da API da OMDb (máximo de 1000 requisições por dia)
+   */
   private static final String OMDB_API_KEY = "da70d648";
 
+  /**
+   * Método principal que inicializa o servidor e escuta conexões de clientes
+   *
+   * @param args não utilizado
+   * @throws IOException se ocorrer erro ao abrir o socket do servidor
+   */
   public static void main(String[] args) throws IOException {
     System.out.println("Servidor rodando na porta " + PORT + "...");
     ServerSocket serverSocket = new ServerSocket(PORT);
@@ -16,6 +50,12 @@ public class BuscaFilmes {
     }
   }
 
+  /**
+   * Lida com a requisição de um cliente individual.
+   * Interpreta os dados da requisição HTTP e envia a resposta correspondente.
+   *
+   * @param client o socket do cliente conectado.
+   */
   private static void handleClient(Socket client) {
     try (
         BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
@@ -72,6 +112,13 @@ public class BuscaFilmes {
     }
   }
 
+  /**
+   * Envia uma resposta HTTP simples com cabeçalhos e conteúdo
+   *
+   * @param writer      o {@link PrintWriter} para enviar dados do cliente.
+   * @param contentType o tipo do conteúdo (ex.: "text/html").
+   * @param content     o conteúdo da resposta.
+   */
   private static void sendHttpResponse(PrintWriter writer, String contentType, String content) {
     writer.print("HTTP/1.1 200 OK\r\n");
     writer.print("Content-Type: " + contentType + "\r\n");
@@ -81,6 +128,11 @@ public class BuscaFilmes {
     writer.flush();
   }
 
+  /**
+   * Gera e retorna o HTML e CSS da página inicial com o formulário de busca.
+   *
+   * @return HTML e CSS em formato de {@code String}.
+   */
   private static String getHtmlForm() {
     return "<!DOCTYPE html>\n" +
         "<html lang=\"pt-BR\">\n" +
@@ -135,6 +187,15 @@ public class BuscaFilmes {
         "</html>";
   }
 
+  /**
+   * Consulta a OMDb API com base no título do filme e se deve mostrar a sinópse
+   * resumida ou não.
+   *
+   * @param titulo          o título do filme a ser buscado.
+   * @param sinopseResumida o {@code Boolean} que verifica o tipo da sinópse.
+   * @return resposta do JSON como {@code String}.
+   * @throws IOException em caso de falha na comunicação com a API.
+   */
   private static String consultarOmdb(String titulo, boolean sinopseResumida) throws IOException {
     Socket socket = new Socket("www.omdbapi.com", 80);
     BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
@@ -169,7 +230,13 @@ public class BuscaFilmes {
     return response.toString();
   }
 
-  // Extrai valor de campo simples no JSON (sem parser JSON)
+  /**
+   * Extrai valor de campo específico de um JSON em string.
+   *
+   * @param json  o JSON como {@code String}.
+   * @param campo o nome do campo a ser extraído.
+   * @return valor correspondente ou "N/A" se não encontrado.
+   */
   private static String extrair(String json, String campo) {
     String busca = "\"" + campo + "\":\"";
     int idx = json.indexOf(busca);
@@ -182,6 +249,14 @@ public class BuscaFilmes {
     return json.substring(start, end);
   }
 
+  /**
+   * Monta o HTML e o CSS para exibir os dados do filme a partir do JSON response
+   * da API.
+   *
+   * @param json o conteúdo do JSON com os dados dos filmes.
+   * @return HTML e CSS formatado contendo informações como título, diretor,
+   *         elenco, etc.
+   */
   private static String montarHtmlResposta(String json) {
     String title = extrair(json, "Title");
     String year = extrair(json, "Year");
@@ -217,4 +292,3 @@ public class BuscaFilmes {
     return sb.toString();
   }
 }
-

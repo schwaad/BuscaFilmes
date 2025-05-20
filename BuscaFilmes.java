@@ -98,8 +98,8 @@ public class BuscaFilmes {
           return;
         }
 
-        String json = consultarOmdb(titulo, sinopseResumida);
-        String html = montarHtmlResposta(json);
+        String json = consultOMDBAPI(titulo, sinopseResumida);
+        String html = HTMLResponseForm(json);
         sendHttpResponse(writer, "text/html; charset=UTF-8", html);
       } else {
         sendHttpResponse(writer, "text/html", "<h1>404 Not Found</h1>");
@@ -196,7 +196,7 @@ public class BuscaFilmes {
    * @return resposta do JSON como {@code String}.
    * @throws IOException em caso de falha na comunicação com a API.
    */
-  private static String consultarOmdb(String titulo, boolean sinopseResumida) throws IOException {
+  private static String consultOMDBAPI(String titulo, boolean sinopseResumida) throws IOException {
     Socket socket = new Socket("www.omdbapi.com", 80);
     BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -237,7 +237,7 @@ public class BuscaFilmes {
    * @param campo o nome do campo a ser extraído.
    * @return valor correspondente ou "N/A" se não encontrado.
    */
-  private static String extrair(String json, String campo) {
+  private static String extractFieldJSON(String json, String campo) {
     String busca = "\"" + campo + "\":\"";
     int idx = json.indexOf(busca);
     if (idx == -1)
@@ -257,13 +257,13 @@ public class BuscaFilmes {
    * @return HTML e CSS formatado contendo informações como título, diretor,
    *         elenco, etc.
    */
-  private static String montarHtmlResposta(String json) {
-    String title = extrair(json, "Title");
-    String year = extrair(json, "Year");
-    String director = extrair(json, "Director");
-    String actors = extrair(json, "Actors");
-    String plot = extrair(json, "Plot");
-    String poster = extrair(json, "Poster");
+  private static String HTMLResponseForm(String json) {
+    String title = extractFieldJSON(json, "Title");
+    String year = extractFieldJSON(json, "Year");
+    String director = extractFieldJSON(json, "Director");
+    String actors = extractFieldJSON(json, "Actors");
+    String plot = extractFieldJSON(json, "Plot");
+    String poster = extractFieldJSON(json, "Poster");
 
     StringBuilder sb = new StringBuilder();
     sb.append("<!DOCTYPE html>\n");

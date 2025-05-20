@@ -15,7 +15,7 @@ import java.net.*;
  * Podendo ainda escolher se vai usar o caminho com plot completo
  * ou simplificado.
  * Endpoint de busca:
- * /buscar?t=Titulo&plot=full
+ * /buscar?t=Titulo&amp;plot=full
  *
  * Requests e Response são manipulados manualmente utilizando sockets.
  * A resposta é construída em HTML, e o JSON é tratado como texto.

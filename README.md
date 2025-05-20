@@ -8,8 +8,9 @@ Um programa em Java integrado com HTML apenas com bibliotecas nativas que consom
 
 ```bash
 javac Main.java
-java Main 
+java Main
 ```
+
 Acesse o [localhost:80/](http://localhost:80/) para visualizar o programa em execução.
 
 ## Compilando e Rodando o Javadoc
